@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Game</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-color: #f0f0f0;
+      --text-color: #333;
+      --btn-bg: #ffffff;
+      --btn-color: #000;
+      --btn-hover-bg: #e0e0e0;
+      --btn-hover-color: #000;
+      --modal-bg: #fff;
+      --modal-color: #222;
+      --xp-bar: #eee;
+      --xp-progress: linear-gradient(90deg, #4caf50, #2196f3);
+      --border-color: #ccc;
+      --shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    [data-theme="light"] {
+      --bg-primary: #f0f0f0;
+      --bg-secondary: #fff;
+      --container-bg: #fff;
+      --text-primary: #222;
+      --text-secondary: #555;
+      --accent-color: #1976d2;
+      --button-bg: #fff;
+      --button-text: #222;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --border-color: #ccc;
+      --question-bg: #fff;
+      --answer-bg: #f0f0f0;
+      --answer-hover-bg: #e0e0e0;
+      --correct-bg: #43e97b;
+      --incorrect-bg: #c0392b;
+      --topbar-bg: #fff;
+      --text-shadow: #ccc;
+      --title-color: #1976d2;
+      --title-shadow: #fff;
+      --selected-bg: #1976d2;
+    }
+    [data-theme="dark"] {
+      --bg-primary: #181818;
+      --bg-secondary: #232323;
+      --container-bg: rgba(34,34,34,0.92);
+      --text-primary: #f5f6fa;
+      --text-secondary: #b0b3b8;
+      --accent-color: #2196f3;
+      --button-bg: #232a34;
+      --button-text: #f5f6fa;
+      --modal-bg: rgba(34,34,34,0.98);
+      --input-bg: #232323;
+      --border-color: #333b4a;
+      --question-bg: #232323;
+      --answer-bg: #181818;
+      --answer-hover-bg: #2196f3;
+      --correct-bg: #43e97b;
+      --incorrect-bg: #c0392b;
+      --topbar-bg: #232323;
+      --text-shadow: #000;
+      --title-color: #2196f3;
+      --title-shadow: #232323;
+      --selected-bg: #2196f3;
+    }
+    [data-theme="dark"] h1,
+    [data-theme="dark"] h2,
+    [data-theme="dark"] h3,
+    [data-theme="dark"] h4,
+    [data-theme="dark"] h5,
+    [data-theme="dark"] h6,
+    [data-theme="dark"] label,
+    [data-theme="dark"] .container label,
+    [data-theme="dark"] .container,
+    [data-theme="dark"] p,
+    [data-theme="dark"] span,
+    [data-theme="dark"] strong,
+    [data-theme="dark"] .question,
+    [data-theme="dark"] .timer,
+    [data-theme="dark"] .profile-modal,
+    [data-theme="dark"] .profile-modal * {
+      color: #fff !important;
+    }
+    [data-theme="dark"] input::placeholder,
+    [data-theme="dark"] select:invalid {
+      color: #eee !important;
+      opacity: 1;
+    }
+    [data-theme="dark"] input,
+    [data-theme="dark"] select {
+      color: #fff !important;
+      background: var(--input-bg) !important;
+      border-color: var(--border-color) !important;
+    }
+    [data-theme="dark"] button {
+      color: #fff !important;
+      background: var(--button-bg) !important;
+      border-color: var(--border-color) !important;
+    }
+    [data-theme="dark"] button:hover {
+      background: var(--accent-color) !important;
+      color: #fff !important;
+      border-color: var(--accent-color) !important;
+    }
+    [data-theme="custom-bg"] {
+      background-color: var(--bg-primary, #e3f9e5) !important;
+      color: var(--text-primary, #234d20) !important;
+    }
+    [data-theme="custom-bg"] body,
+    [data-theme="custom-bg"] .container,
+    [data-theme="custom-bg"] .profile-modal,
+    [data-theme="custom-bg"] .xp-bar,
+    [data-theme="custom-bg"] button,
+    [data-theme="custom-bg"] input,
+    [data-theme="custom-bg"] select {
+      background: var(--modal-bg, rgba(255,255,255,0.95)) !important;
+      color: var(--text-primary, #234d20) !important;
+      border-color: var(--border-color, #4f772d) !important;
+      box-shadow: var(--shadow, 0 4px 24px rgba(90,209,255,0.18)) !important;
+      backdrop-filter: blur(8px);
+    }
+    [data-theme="custom-bg"] .profile-modal,
+    [data-theme="custom-bg"] .profile-modal[style] {
+      background: var(--modal-bg, rgba(255,255,255,0.95)) !important;
+      color: var(--text-primary, #234d20) !important;
+      border: 2px solid var(--border-color, #4f772d) !important;
+      box-shadow: 0 8px 32px #b7e4c7 !important;
+    }
+    [data-theme="custom-bg"] .profile-modal h2,
+    [data-theme="custom-bg"] .profile-modal h3 {
+      color: var(--text-primary, #234d20) !important;
+      text-shadow: 0 0 12px var(--text-shadow, #b7e4c7), 0 0 2px #fff;
+    }
+    [data-theme="custom-bg"] .profile-modal button {
+      background: var(--button-bg, #f9dc5c) !important;
+      color: var(--button-text, #234d20) !important;
+      border: none !important;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1.1em;
+      box-shadow: 0 2px 12px #b7e4c7;
+      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+    }
+    [data-theme="custom-bg"] .profile-modal button:hover {
+      background: var(--accent-color, #f9dc5c) !important;
+      color: var(--text-primary, #234d20) !important;
+      box-shadow: 0 0 24px #f9dc5c99;
+    }
+    [data-theme="custom-bg"] .xp-bar {
+      background: var(--xp-bar, #b7e4c7) !important;
+    }
+    [data-theme="custom-bg"] .xp-progress {
+      background: var(--xp-progress, linear-gradient(90deg, #b7e4c7, #f9dc5c)) !important;
+    }
+    [data-theme="custom-bg"] button {
+      background: var(--button-bg, #f9dc5c) !important;
+      color: var(--button-text, #234d20) !important;
+      border: 2px solid var(--border-color, #4f772d) !important;
+      backdrop-filter: blur(4px);
+    }
+    [data-theme="custom-bg"] button:hover {
+      background: var(--accent-color, #f9dc5c) !important;
+      color: var(--text-primary, #234d20) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px #f9dc5c99 !important;
+    }
+    [data-theme="custom-bg"] input,
+    [data-theme="custom-bg"] select {
+      background: var(--input-bg, #d8f3dc) !important;
+      color: var(--text-primary, #234d20) !important;
+      border: 2px solid var(--border-color, #4f772d) !important;
+      backdrop-filter: blur(4px);
+    }
+    [data-theme="custom-bg"] #topBar > div,
+    [data-theme="custom-bg"] #topBar > div span,
+    [data-theme="custom-bg"] #profileTrophies,
+    [data-theme="custom-bg"] #profileCoins,
+    [data-theme="custom-bg"] #profileGems {
+      background: var(--topbar-bg, #16213e) !important;
+      color: var(--text-primary, #fff) !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 10px !important;
+      font-weight: bold;
+      text-shadow: 0 0 8px var(--text-shadow, #5ad1ff), 0 0 2px #fff;
+      padding: 6px 14px;
+    }
+    [data-theme="custom-bg"] #topBar > div span {
+      color: var(--text-primary, #234d20) !important;
+    }
+    [data-theme="custom-bg"] #topBar > div {
+      border-radius: 10px !important;
+    }
+    [data-theme="custom-bg"] #quizTitle {
+      text-shadow: 0 0 20px var(--text-shadow, #b7e4c7);
+      color: var(--text-primary, #234d20) !important;
+    }
+    [data-theme="custom-bg"] .question {
+      color: var(--text-primary, #234d20) !important;
+      text-shadow: 0 2px 8px var(--text-shadow, #b7e4c7), 0 0 2px #fff;
+      background: var(--question-bg, rgba(255,255,255,0.92)) !important;
+      border: 2px solid var(--border-color, #4f772d) !important;
+      box-shadow: 0 0 16px 2px #b7e4c7;
+      font-weight: bold;
+      font-size: 1.25em;
+    }
+    [data-theme="custom-bg"] .answer-button {
+      color: var(--text-primary, #234d20) !important;
+      text-shadow: 0 2px 8px var(--text-shadow, #b7e4c7), 0 0 2px #fff;
+      background: var(--answer-bg, #f6fff8) !important;
+      border: 2px solid var(--border-color, #4f772d) !important;
+      box-shadow: 0 0 12px 2px #b7e4c7;
+      font-weight: bold;
+      font-size: 1.1em;
+      transition: 0.2s;
+    }
+    [data-theme="custom-bg"] .answer-button:hover {
+      background: var(--answer-hover-bg, #f9dc5c) !important;
+      color: var(--text-primary, #234d20) !important;
+      text-shadow: 0 2px 8px #fff, 0 0 2px #f9dc5c;
+      border-color: var(--accent-color, #f9dc5c) !important;
+      box-shadow: 0 0 24px 4px #f9dc5c99;
+    }
+    [data-theme="custom-bg"] .answer-button.correct {
+      background: var(--correct-bg, #1976d2) !important;
+      border-color: var(--border-color, #5ad1ff) !important;
+    }
+    [data-theme="custom-bg"] .answer-button.incorrect {
+      background: var(--incorrect-bg, #c0392b) !important;
+      border-color: var(--incorrect-bg, #c0392b) !important;
+    }
+    [data-theme="custom-bg"] .answer-button.selected {
+      background: var(--selected-bg, #5ad1ff) !important;
+      color: var(--text-primary, #fff) !important;
+      border-color: var(--accent-color, #0f3460) !important;
+      box-shadow: 0 0 16px 2px var(--selected-bg, #5ad1ff);
+      pointer-events: none;
+    }
+    /* Overlay per contrasto */
+    #bgOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+      pointer-events: none;
+      z-index: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.9em;
+      margin-top: 5px;
+      display: none;
+    }
+    .error-message.show {
+      display: block;
+    }
+    .container, .modal, .setup-modal, #setupSection, #mainMenu, #profileModal, #leaderboardModal, #missionsModal, #shopModal, #challengeModal, #challengeInvitesModal {
+      background: var(--container-bg, #fff) !important;
+      color: var(--text-primary, #222) !important;
+      border-radius: 24px;
+      box-shadow: 0 4px 32px 0 rgba(0,0,0,0.10);
+      border: 2px solid var(--border-color, #ccc);
+      padding: 32px 24px;
+      margin: 0 auto;
+      transition: background 0.3s, color 0.3s;
+    }
+    input, select, button {
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+    button {
+      background-color: var(--button-bg);
+      color: var(--button-text);
+      cursor: pointer;
+      border: 2px solid var(--border-color);
+      transition: 0.2s ease, box-shadow 0.2s;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(33,150,243,0.08);
+    }
+    button:hover {
+      transform: scale(1.05);
+      background: var(--accent-color);
+      color: #fff;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 16px 2px var(--accent-color, #2196f3);
+    }
+    .theme-toggle, #themeSelect {
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+      box-shadow: 0 2px 8px rgba(33,150,243,0.08);
+      outline: none;
+      appearance: none;
+    }
+    .theme-toggle:focus, #themeSelect:focus {
+      border: 2px solid var(--accent-color);
+      box-shadow: 0 0 8px var(--accent-color, #2196f3);
+    }
+    .profile-button {
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      border: none;
+      color: var(--text-color);
+      padding: 0;
+      margin: 0;
+    }
+    .back-button {
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      border: none;
+      color: var(--text-color);
+      z-index: 1100;
+    }
+    .profile-modal {
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background-color: var(--background-color, #fff);
+      color: var(--text-color, #000);
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .xp-bar {
+      width: 100%;
+      height: 16px;
+      background: #eee;
+      border-radius: 8px;
+      margin: 5px 0;
+      overflow: hidden;
+    }
+    .xp-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #2196f3);
+      width: 0%;
+      transition: width 0.5s;
+    }
+    .leaderboard-button {
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      border: none;
+      color: var(--text-color);
+    }
+    .friends-button {
+      background: none;
+      font-size: 22px;
+      cursor: pointer;
+      border: none;
+      color: var(--text-color);
+    }
+    .leaderboard-switch {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: var(--btn-bg);
+      color: var(--btn-color);
+      cursor: pointer;
+    }
+    .leaderboard-switch.active {
+      background: gold;
+      color: #000;
+    }
+    .friends-switch {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: var(--btn-bg);
+      color: var(--btn-color);
+      cursor: pointer;
+    }
+    .friends-switch.active {
+      background: gold;
+      color: #000;
+    }
+    #friendsList, #friendsInvitesList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #friendsList li, #friendsInvitesList li {
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #friendsList li button, #friendsInvitesList li button {
+      margin-left: 8px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: var(--btn-bg);
+      color: var(--btn-color);
+      cursor: pointer;
+      font-size: 0.95em;
+    }
+    .question {
+      font-size: 20px;
+      margin-top: 20px;
+    }
+    .answers {
+      margin-top: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    #playersList ul li {
+      margin: 5px 0;
+    }
+    .timer {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .answer-button {
+      width: 100%;
+      margin: 5px 0;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .answer-button.correct {
+      background-color: var(--correct-bg);
+    }
+    .answer-button.incorrect {
+      background-color: var(--incorrect-bg);
+    }
+    .answer-button.selected {
+      background: var(--selected-bg, #1976d2) !important;
+      color: #fff !important;
+      border-color: var(--accent-color, #1976d2) !important;
+      box-shadow: 0 0 16px 2px var(--selected-bg, #1976d2);
+      pointer-events: none;
+    }
+    #centeredContainer {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    #quizTitle {
+      position: relative;
+      margin-bottom: 20px;
+      z-index: 2000;
+      font-size: 2em;
+      color: var(--text-color);
+      text-align: center;
+    }
+    #scoreboardScreen {
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 320px;
+      max-width: 90%;
+      background: var(--bg-color, #fff);
+      color: var(--text-color, #000);
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      padding: 24px 16px;
+      z-index: 1000;
+      display: none;
+      text-align: left;
+      font-size: 1.1em;
+    }
+    .podium-first { color: #FFD700; font-weight: bold; }
+    .podium-second { color: #C0C0C0; font-weight: bold; }
+    .podium-third { color: #CD7F32; font-weight: bold; }
+    .scoreboard-player { color: var(--text-color, #000); }
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+    .fade-out {
+      opacity: 1;
+      animation: fadeOut 1s forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; }
+    }
+    [data-theme="dark"] label,
+    [data-theme="dark"] .profile-modal {
+      color: #f0f0f0;
+    }
+    [data-theme="dark"] .profile-modal {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+    }
+    [data-theme="dark"] .profile-modal h3,
+    [data-theme="dark"] .profile-modal p {
+      color: #f0f0f0;
+    }
+    [data-theme="dark"] .xp-bar {
+      background: #333 !important;
+    }
+    [data-theme="dark"] .xp-progress {
+      background: linear-gradient(90deg, #00c6fb, #005bea) !important;
+    }
+    [data-theme="dark"] #topLeftStats > div {
+      background: #222 !important;
+      color: #f0f0f0 !important;
+    }
+
+    /* Chat compatta in partita: stile migliorato */
+    #gameChatContainer {
+      flex-direction: column !important;
+      align-items: flex-end !important;
+      background: rgba(255,255,255,0.97);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 4px 4px 2px 4px;
+      min-width: 220px;
+      max-width: 90vw;
+      width: 240px;
+      bottom: 10px !important;
+      right: 10px !important;
+      position: absolute !important;
+      z-index: 100;
+      display: none;
+    }
+    #gameChatBox {
+      min-height: 40px;
+      max-height: 80px;
+      font-size: 0.97em;
+      overflow-y: auto;
+      background: #f7f7f7;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 4px 6px 2px 6px;
+      margin-bottom: 2px;
+    }
+    #gameChatContainer input[type="text"] {
+      flex: 1;
+      padding: 4px 6px;
+      font-size: 0.97em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #gameChatSend {
+      padding: 4px 10px;
+      font-size: 0.97em;
+      border-radius: 6px;
+    }
+    [data-theme="custom-bg"] .container {
+      background: var(--container-bg, #16213e) !important;
+      color: var(--text-primary, #fff) !important;
+      border: 2px solid var(--border-color, #5ad1ff) !important;
+      box-shadow: 0 8px 32px 0 var(--bg-secondary, #16213e);
+      border-radius: 24px;
+    }
+    [data-theme="custom-bg"] h1#quizTitle {
+      color: var(--title-color, #5ad1ff) !important;
+      text-shadow: 0 0 18px var(--title-shadow, #fff), 0 0 2px #0f3460;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+    }
+    [data-theme="custom-bg"] label,
+    [data-theme="custom-bg"] .container label {
+      color: var(--text-secondary, #e2e2e2) !important;
+      text-shadow: 0 0 6px var(--text-shadow, #0f3460);
+      font-weight: 600;
+    }
+    [data-theme="custom-bg"] input,
+    [data-theme="custom-bg"] select {
+      background: var(--input-bg, #1a1a2e) !important;
+      color: var(--text-primary, #fff) !important;
+      border: 2px solid var(--border-color, #5ad1ff) !important;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px var(--bg-secondary, #16213e);
+      font-size: 1.1em;
+      font-weight: 600;
+      padding: 12px 18px;
+      margin: 8px 0;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    [data-theme="custom-bg"] input::placeholder,
+    [data-theme="custom-bg"] select:invalid {
+      color: var(--text-secondary, #e2e2e2) !important;
+      opacity: 1;
+    }
+    [data-theme="custom-bg"] input:focus,
+    [data-theme="custom-bg"] select:focus {
+      border: 2px solid var(--accent-color, #0f3460) !important;
+      box-shadow: 0 0 16px var(--accent-color, #0f3460);
+      outline: none;
+    }
+    [data-theme="custom-bg"] button {
+      background: var(--button-bg, #0f3460) !important;
+      color: var(--button-text, #fff) !important;
+      border: 2px solid var(--border-color, #5ad1ff) !important;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1.1em;
+      box-shadow: 0 2px 12px var(--bg-secondary, #16213e);
+      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+    }
+    [data-theme="custom-bg"] button:hover {
+      background: var(--accent-color, #0f3460) !important;
+      color: var(--text-primary, #fff) !important;
+      box-shadow: 0 0 24px var(--accent-color, #0f3460);
+    }
+    [data-theme="custom-bg"] .question {
+      background: var(--question-bg, #16213e) !important;
+      color: var(--text-primary, #fff) !important;
+      border: 2px solid var(--border-color, #5ad1ff) !important;
+      box-shadow: 0 0 16px 2px var(--bg-secondary, #16213e);
+      font-weight: bold;
+      font-size: 1.25em;
+      text-shadow: 0 2px 8px var(--text-shadow, #0f3460), 0 0 2px #fff;
+    }
+    [data-theme="custom-bg"] .answer-button {
+      background: var(--answer-bg, #1a1a2e) !important;
+      color: var(--text-primary, #fff) !important;
+      border: 2px solid var(--border-color, #5ad1ff) !important;
+      box-shadow: 0 0 12px 2px var(--bg-secondary, #16213e);
+      font-weight: bold;
+      font-size: 1.1em;
+      transition: 0.2s;
+      text-shadow: 0 2px 8px var(--text-shadow, #0f3460), 0 0 2px #fff;
+    }
+    [data-theme="custom-bg"] .answer-button:hover {
+      background: var(--answer-hover-bg, #0f3460) !important;
+      color: var(--text-primary, #fff) !important;
+      border-color: var(--accent-color, #0f3460) !important;
+      box-shadow: 0 0 24px 4px var(--accent-color, #0f3460);
+    }
+    [data-theme="custom-bg"] .answer-button.correct {
+      background: var(--correct-bg, #1976d2) !important;
+      border-color: var(--border-color, #5ad1ff) !important;
+    }
+    [data-theme="custom-bg"] .answer-button.incorrect {
+      background: var(--incorrect-bg, #c0392b) !important;
+      border-color: var(--incorrect-bg, #c0392b) !important;
+    }
+    [data-theme="dark"] #trophiesBox,
+    [data-theme="dark"] #coinsBox,
+    [data-theme="dark"] #gemsBox {
+      background: var(--topbar-bg, #232323) !important;
+      color: #fff !important;
+      border-radius: 10px !important;
+      border: 1.5px solid var(--border-color, #333b4a) !important;
+      box-shadow: 0 2px 8px rgba(33,150,243,0.10) !important;
+    }
+    [data-theme="dark"] #trophiesBox span,
+    [data-theme="dark"] #coinsBox span,
+    [data-theme="dark"] #gemsBox span {
+      color: #fff !important;
+    }
+    [data-theme="dark"] .answer-button.selected {
+      background: var(--selected-bg, #2196f3) !important;
+      color: #fff !important;
+      border-color: var(--accent-color, #2196f3) !important;
+      box-shadow: 0 0 16px 2px var(--selected-bg, #2196f3);
+    }
+    .answer-button.correct {
+      background: var(--correct-bg, #43e97b) !important;
+      color: #fff !important;
+      border-color: var(--correct-bg, #43e97b) !important;
+    }
+    .answer-button.incorrect {
+      background: var(--incorrect-bg, #c0392b) !important;
+      color: #fff !important;
+      border-color: var(--incorrect-bg, #c0392b) !important;
+    }
+    /* 🌅 Tramonto */
+    [data-theme="sunset"] {
+      --bg-primary: #ffecd2;
+      --bg-secondary: #fcb69f;
+      --container-bg: #ffe5d9;
+      --text-primary: #6d3b47;
+      --text-secondary: #b5838d;
+      --accent-color: #ff6f61;
+      --button-bg: #ffb4a2;
+      --button-text: #6d3b47;
+      --modal-bg: #ffe5d9;
+      --input-bg: #fff3e6;
+      --border-color: #ff6f61;
+      --question-bg: #fff3e6;
+      --answer-bg: #ffecd2;
+      --answer-hover-bg: #ffb4a2;
+      --correct-bg: #43e97b;
+      --incorrect-bg: #c0392b;
+      --topbar-bg: #fcb69f;
+      --text-shadow: #ffb4a2;
+      --title-color: #ff6f61;
+      --title-shadow: #fff3e6;
+      --selected-bg: #ff6f61;
+    }
+    /* 🌊 Oceano */
+    [data-theme="ocean"] {
+      --bg-primary: #e0f7fa;
+      --bg-secondary: #b2ebf2;
+      --container-bg: #e0f7fa;
+      --text-primary: #01579b;
+      --text-secondary: #0288d1;
+      --accent-color: #00bcd4;
+      --button-bg: #4dd0e1;
+      --button-text: #01579b;
+      --modal-bg: #b2ebf2;
+      --input-bg: #b2ebf2;
+      --border-color: #00bcd4;
+      --question-bg: #b2ebf2;
+      --answer-bg: #e0f7fa;
+      --answer-hover-bg: #4dd0e1;
+      --correct-bg: #43e97b;
+      --incorrect-bg: #c0392b;
+      --topbar-bg: #b2ebf2;
+      --text-shadow: #00bcd4;
+      --title-color: #0288d1;
+      --title-shadow: #e0f7fa;
+      --selected-bg: #00bcd4;
+    }
+    /* 🍃 Natura */
+    [data-theme="nature"] {
+      --bg-primary: #e9f5db;
+      --bg-secondary: #b5c99a;
+      --container-bg: #e9f5db;
+      --text-primary: #386641;
+      --text-secondary: #6a994e;
+      --accent-color: #a7c957;
+      --button-bg: #b5c99a;
+      --button-text: #386641;
+      --modal-bg: #b5c99a;
+      --input-bg: #f2e8cf;
+      --border-color: #6a994e;
+      --question-bg: #f2e8cf;
+      --answer-bg: #e9f5db;
+      --answer-hover-bg: #a7c957;
+      --correct-bg: #43e97b;
+      --incorrect-bg: #c0392b;
+      --topbar-bg: #b5c99a;
+      --text-shadow: #a7c957;
+      --title-color: #386641;
+      --title-shadow: #f2e8cf;
+      --selected-bg: #a7c957;
+    }
+    .container button, .container .button, #continueSetup {
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 1.18em;
+      font-weight: 700;
+      padding: 14px 32px;
+      margin: 12px 10px;
+      box-shadow: 0 2px 12px 0 rgba(33,150,243,0.10);
+      transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;
+      outline: none;
+      display: inline-block;
+    }
+    .container button:hover, .container .button:hover, #continueSetup:hover {
+      background: var(--accent-color);
+      color: #fff;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 16px 2px var(--accent-color, #2196f3);
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 700px;
+      background: var(--container-bg);
+      color: var(--text-primary);
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+      backdrop-filter: blur(4px);
+      border: 1.5px solid var(--border-color);
+    }
+    /* Stili per [data-theme="custom-bg"] per garantire priorità */
+    [data-theme="custom-bg"] body {
+      background-color: var(--bg-primary) !important;
+      color: var(--text-primary) !important;
+    }
+
+    [data-theme="custom-bg"] .container,
+    [data-theme="custom-bg"] #setupSection,
+    [data-theme="custom-bg"] #mainMenu {
+      background: var(--container-bg) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border-color) !important;
+      box-shadow: var(--shadow) !important;
+    }
+
+    [data-theme="custom-bg"] h1,
+    [data-theme="custom-bg"] h2,
+    [data-theme="custom-bg"] h3,
+    [data-theme="custom-bg"] label,
+    [data-theme="custom-bg"] p,
+    [data-theme="custom-bg"] span {
+      color: var(--text-primary) !important;
+    }
+
+    [data-theme="custom-bg"] input,
+    [data-theme="custom-bg"] select {
+      background: var(--input-bg) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border-color) !important;
+    }
+    [data-theme="custom-bg"] input::placeholder,
+    [data-theme="custom-bg"] select:invalid {
+      color: var(--text-secondary, var(--text-primary)) !important; /* Fallback a text-primary */
+      opacity: 0.8 !important;
+    }
+
+    [data-theme="custom-bg"] button {
+      background: var(--button-bg) !important;
+      color: var(--button-text) !important;
+      border-color: var(--border-color) !important;
+    }
+
+    [data-theme="custom-bg"] button:hover {
+      background: var(--accent-color) !important; /* Usa accent per hover come negli altri temi */
+      border-color: var(--accent-color) !important;
+      /* color: var(--button-text) o var(--text-primary) a seconda del contrasto con accent */
+    }
+
+    [data-theme="custom-bg"] #quizTitle {
+      color: var(--title-color, var(--text-primary)) !important; /* Fallback a text-primary */
+      text-shadow: 0 0 18px var(--title-shadow, var(--text-shadow)) !important; /* Fallback a text-shadow */
+    }
+  </style>
+</head>
+<body data-theme="light">
+
+
+
+
+  <div id="topBar" style="position: absolute; top: 20px; left: 20px; z-index: 1200; display: flex; align-items: center; gap: 18px;">
+    <button class="back-button" id="backButton" title="Indietro" style="display:none; margin-right: 18px;">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div id="trophiesBox" style="background: #fff; border-radius: 8px; padding: 8px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center;">
+      <span style="font-size: 1.3em; margin-right: 6px;">🏆</span>
+      <span id="profileTrophies">0</span>
+    </div>
+    <div id="coinsBox" style="background: #fff; border-radius: 8px; padding: 8px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center;">
+      <span style="font-size: 1.3em; margin-right: 6px;">🪙</span>
+      <span id="profileCoins">0</span>
+    </div>
+    <div id="gemsBox" style="background: #fff; border-radius: 8px; padding: 8px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center;">
+      <span style="font-size: 1.3em; margin-right: 6px;">💎</span>
+      <span id="profileGems">0</span>
+    </div>
+  </div>
+
+
+
+
+  <!-- Barra top icone -->
+  <div id="topIconsBar" style="position: absolute; top: 16px; right: 16px; z-index: 1200; display: flex; align-items: center; gap: 18px;">
+    <!-- Ordine corretto: leaderboard, missions, friends, profile, theme -->
+    <button class="leaderboard-button" id="leaderboardButton" title="Classifica" style="background:none;font-size:22px;cursor:pointer;border:none;color:var(--text-color);padding:0;margin:0;">
+      <i class="fas fa-crown"></i>
+    </button>
+    <button class="missions-button" id="missionsButton" title="Missioni" style="background:none;font-size:22px;cursor:pointer;border:none;color:var(--text-color);padding:0;margin:0;">
+      <i class="fas fa-scroll"></i>
+    </button>
+    <button class="shop-button" id="shopButton" title="Negozio" style="background:none;font-size:22px;cursor:pointer;border:none;color:var(--text-color);padding:0;margin:0;">
+      <i class="fas fa-store"></i>
+    </button>
+    <button class="friends-button" id="friendsButton" title="Amici" style="background:none;font-size:22px;cursor:pointer;border:none;color:var(--text-color);padding:0;margin:0;position:relative;">
+      <i class="fas fa-user-friends"></i>
+      <span id="friendsBadge" style="display:none;position:absolute;top:0;right:0;background:red;color:white;border-radius:50%;font-size:12px;padding:2px 6px;">1</span>
+    </button>
+    <button class="profile-button" id="profileButton" title="Mostra Profilo" style="background:none;font-size:22px;cursor:pointer;border:none;color:var(--text-color);padding:0;margin:0;display:flex;align-items:center;">
+      <i class="fas fa-user"></i>
+    </button>
+    <button class="theme-toggle" id="themeToggle" title="Cambia Tema" style="background:none;font-size:22px;cursor:pointer;border:none;color:var(--text-color);padding:0;margin:0;">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+
+
+
+
+  <div id="profileModal" class="profile-modal" style="display: none;">
+    <h2>Profilo</h2>
+    <!-- Avatar profilo -->
+    <div style="margin-bottom:10px;">
+      <img id="profileAvatar" src="avatars/avatar1.png" alt="Avatar" style="width:64px;height:64px;border-radius:50%;border:2px solid #888;">
+    </div>
+    <!-- Selettore avatar -->
+    <div id="avatarSelector" style="margin-bottom:10px;">
+      <span style="font-size:0.95em;">Scegli avatar:</span>
+      <img src="avatars/avatar1.png" alt="avatar1" style="width:32px;height:32px;cursor:pointer;border-radius:50%;border:2px solid #ccc;margin:0 2px;" onclick="setAvatar('avatar1.png')">
+      <img src="avatars/avatar2.png" alt="avatar2" style="width:32px;height:32px;cursor:pointer;border-radius:50%;border:2px solid #ccc;margin:0 2px;" onclick="setAvatar('avatar2.png')">
+      <img src="avatars/avatar3.png" alt="avatar3" style="width:32px;height:32px;cursor:pointer;border-radius:50%;border:2px solid #ccc;margin:0 2px;" onclick="setAvatar('avatar3.png')">
+      <img src="avatars/avatar4.png" alt="avatar4" style="width:32px;height:32px;cursor:pointer;border-radius:50%;border:2px solid #ccc;margin:0 2px;" onclick="setAvatar('avatar4.png')">
+      <img src="avatars/avatar5.png" alt="avatar5" style="width:32px;height:32px;cursor:pointer;border-radius:50%;border:2px solid #ccc;margin:0 2px;" onclick="setAvatar('avatar5.png')">
+      <img src="avatars/avatar6.png" alt="avatar6" style="width:32px;height:32px;cursor:pointer;border-radius:50%;border:2px solid #ccc;margin:0 2px;" onclick="setAvatar('avatar6.png')">
+      <img src="avatars/avatar7.png" alt="avatar7" style="width:32px;height:32px;cursor:pointer;border-radius:50%;border:2px solid #ccc;margin:0 2px;" onclick="setAvatar('avatar7.png')">
+      <img src="avatars/avatar8.png" alt="avatar8" style="width:32px;height:32px;cursor:pointer;border-radius:50%;border:2px solid #ccc;margin:0 2px;" onclick="setAvatar('avatar8.png')">
+    </div>
+    <p><strong>Nome utente:</strong> <span id="profileName"></span></p>
+    <p><strong>Lingua:</strong> <span id="profileLanguage"></span></p>
+    <div id="profileLevelXp">
+      <span>Livello: <span id="profileLevel"></span></span>
+      <div class="xp-bar" style="width: 100%; height: 16px; background: #eee; border-radius: 8px; margin: 5px 0; overflow: hidden;">
+        <div class="xp-progress" id="profileXpBar" style="height: 100%; background: linear-gradient(90deg, #4caf50, #2196f3); width: 0%; transition: width 0.5s;"></div>
+      </div>
+      <span>XP: <span id="profileXp"></span> / <span id="profileXpNext"></span></span>
+    </div>
+    <div class="stats" style="margin-top:10px;">
+      <span>Partite giocate: <span id="profileGamesPlayed"></span></span><br>
+      <span>Vittorie: <span id="profileGamesWon"></span></span><br>
+      <span>Risposte corrette: <span id="profileCorrect"></span></span><br>
+      <span>Risposte sbagliate: <span id="profileWrong"></span></span>
+    </div>
+    <!-- Avatar sbloccati -->
+    <div id="unlockedAvatarsBox" style="margin-top:12px;display:none;">
+      <strong>Avatar sbloccati:</strong>
+      <div id="unlockedAvatars" style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <!-- Sfondi sbloccati -->
+    <div id="unlockedBackgroundsBox" style="margin-top:12px;display:none;">
+      <strong>Sfondi sbloccati:</strong>
+      <div id="unlockedBackgrounds" style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <button id="logoutButton" class="logout-button">Logout</button>
+    <button id="closeProfileModal" class="logout-button" style="background:#888; margin-left:10px;">Chiudi</button>
+  </div>
+  <div id="leaderboardModal" class="profile-modal" style="display:none; min-width:300px;">
+    <h2 id="leaderboardTitle">Classifica</h2>
+    <div style="margin-bottom:10px;">
+      <button id="showNational" class="leaderboard-switch">Nazionale</button>
+      <button id="showGlobal" class="leaderboard-switch">Globale</button>
+    </div>
+    <ul id="leaderboardList"></ul>
+    <div id="yourPosition" style="margin-top:10px; font-weight:bold;"></div>
+    <span id="leaderboardCountdown" style="font-size: 0.9em; color: #888;"></span>
+    <button id="closeLeaderboardModal" class="logout-button" style="background:#888;">Chiudi</button>
+  </div>
+  <div id="friendsModal" class="profile-modal" style="display:none; min-width:300px;">
+    <h2>Amici</h2>
+    <div style="margin-bottom:10px;">
+      <button id="showFriendsListTab" class="friends-switch active">Lista amici</button>
+      <button id="showFriendsNotificationsTab" class="friends-switch">Notifiche</button>
+    </div>
+    <div id="friendsListSection">
+      <div style="margin-bottom:10px;">
+        <input type="text" id="addFriendInput" placeholder="Nome utente da aggiungere" style="width:60%;">
+        <button id="addFriendBtn">Aggiungi</button>
+        <span id="addFriendError" class="error-message"></span>
+      </div>
+      <ul id="friendsList"></ul>
+    </div>
+    <div id="friendsNotificationsSection" style="display:none;">
+      <ul id="friendsInvitesList"></ul>
+    </div>
+    <button id="closeFriendsModal" style="background:#888;">Chiudi</button>
+  </div>
+  <div id="missionsModal" class="profile-modal" style="display:none; min-width:300px;">
+    <h2>Missioni</h2>
+    <ul id="missionsList" style="list-style:none;padding:0"></ul>
+    <button id="closeMissionsModal" style="background:#888; margin-top:16px;">Chiudi</button>
+  </div>
+
+
+
+
+  <div class="container">
+    <h1 id="quizTitle"><i class="fa-solid fa-brain"></i> Quiz Game</h1>
+    <div id="scoreboardScreen" style="display:none;"></div>
+    <div id="authSection">
+      <h2>Registrati</h2>
+      <input type="text" id="regUsername" placeholder="Username">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPassword" placeholder="Password">
+      <input type="text" id="regCountry" placeholder="Paese">
+      <button id="registerBtn" class="button">Registrati</button>
+      <div id="registerError" class="error-message"></div>
+      <h2>Login</h2>
+      <input type="text" id="loginUsername" placeholder="Username">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="loginBtn" class="button">Login</button>
+      <p id="loginError" class="error-message"></p>
+      <p class="forgot-password-link"><a href="#" id="showForgotPasswordForm">Password dimenticata?</a></p>
+    </div>
+    <div id="guestSection">
+      <h2>Oppure...</h2>
+      <button id="continueAsGuestBtn" class="button">Continua come Ospite</button>
+    </div>
+    <!-- Sezione Forgot Password (NUOVA) -->
+    <div id="forgotPasswordSection" class="auth-form" style="display:none; max-width: 420px; width: 95%; margin: 0 auto;">
+      <h2 style="margin: 18px 0 18px 0; color: #5ad1ff; text-shadow: 0 0 8px #fff, 0 0 2px #5ad1ff; font-size: 1.25em; font-weight: 700;">Reset Password</h2>
+      <p style="margin-bottom: 18px; color: #e2e2e2; font-size: 1.08em;">Inserisci il tuo username per ricevere un link di reset.</p>
+      <div class="input-group" style="margin-bottom: 22px; display: flex; justify-content: center;">
+        <input type="text" id="forgotInput" placeholder="Il tuo Username" style="width: 90%; max-width: 320px; padding: 13px 15px; font-size: 1.08em; border-radius: 8px; border: 2px solid #5ad1ff; margin: 0 auto; display: block; font-weight: 500; text-align: left;" />
+      </div>
+      <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 10px;">
+        <button id="forgotPasswordBtn" style="padding: 12px 0; font-size: 1.08em; font-weight: bold;">Invia Link di Reset</button>
+        <button id="backToLoginBtn" class="secondary-button" style="padding: 12px 0; font-size: 1.08em; font-weight: bold;">Torna al Login</button>
+      </div>
+      <p id="forgotPasswordMessage" class="message" style="margin-top: 12px; font-size: 1.05em;"></p>
+      <style>
+        #forgotPasswordSection input::placeholder {
+          color: var(--text-secondary, #b7e4c7);
+          opacity: 1;
+        }
+        @media (max-width: 600px) {
+          #forgotPasswordSection { max-width: 99vw; }
+          #forgotPasswordSection input { font-size: 1em; }
+          #forgotPasswordSection button { width: 100%; min-width: 0; }
+        }
+      </style>
+    </div>
+    <div id="setupSection">
+      <div id="modeSelectContainer" style="margin-bottom: 12px;">
+        <label for="modeSelect" style="font-weight:bold;">Modalità di gioco:</label>
+        <select id="modeSelect">
+          <option value="">Seleziona modalità</option>
+          <option value="classic">Classica</option>
+        </select>
+      </div>
+      <input type="text" id="usernameInput" placeholder="Inserisci il tuo nome ">
+      <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="it">Italiano</option>
+        <option value="pt">Português</option>
+        <option value="ru">Русский</option>
+        <option value="zh">中文</option>
+        <option value="ar">العربية</option>
+        <option value="ja">日本語</option>
+        <option value="hi">हिन्दी</option>
+      </select>
+      <div id="classicOptions" style="display:none;">
+        <select id="categorySelect">
+          <option value="">Categoria (tutte)</option>
+          <option value="9">Generale</option>
+          <option value="21">Sport</option>
+          <option value="23">Storia</option>
+          <option value="17">Scienza</option>
+          <option value="22">Geografia</option>
+        </select>
+        <select id="difficultySelect">
+          <option value="">Difficoltà (tutte)</option>
+          <option value="easy">Facile</option>
+          <option value="medium">Media</option>
+          <option value="hard">Difficile</option>
+        </select>
+      </div>
+      <button id="continueSetup"><i class="fa-solid fa-arrow-right"></i> Continua</button>
+    </div>
+    <div id="mainMenu" style="display:none;">
+      <button id="createLobby"><i class="fa-solid fa-plus"></i> Crea una Lobby</button>
+      <button id="joinLobby"><i class="fa-solid fa-right-to-bracket"></i> Unisciti a una Lobby</button>
+      <button id="tournamentBtn" style="margin-top:10px;"><i class="fa-solid fa-trophy"></i> Torneo</button>
+      <button id="challengeFriendBtn" style="margin-top:10px;"><i class="fa-solid fa-user-friends"></i> Sfida un amico</button>
+      <!-- Bottoni Tutorial e Condividi -->
+      <div style="margin-top:12px;">
+        <button onclick="showTutorial()" style="margin-right:8px;"><i class="fa-solid fa-question-circle"></i> Tutorial</button>
+        <button onclick="shareResult(window.ultimoPunteggio||0)"><i class="fa-solid fa-share-nodes"></i> Condividi</button>
+      </div>
+      <div id="lobbyCodeDisplay" style="display: none; margin-top: 10px; font-size: 1.2em;">
+        Codice Lobby: <strong id="lobbyCode"></strong>
+      </div>
+      <div id="lobbySection" style="display:none;">
+        <input type="text" id="lobbyIdInput" placeholder="Inserisci l'ID della lobby">
+        <button id="joinLobbyButton"><i class="fa-solid fa-plug"></i> Unisciti</button>
+        <!-- Chat della lobby -->
+        <div id="lobbyChatContainer" style="margin-top:16px;">
+          <div id="lobbyChatBox" style="height:100px;overflow-y:auto;background:#f7f7f7;border:1px solid #ccc;border-radius:6px;padding:6px 8px;margin-bottom:6px;font-size:0.98em;"></div>
+          <div style="display:flex;gap:6px;">
+            <input id="lobbyChatInput" type="text" placeholder="Scrivi un messaggio..." style="flex:1;padding:6px;">
+            <button id="lobbyChatSend" style="padding:6px 12px;">Invia</button>
+          </div>
+        </div>
+      </div>
+      <div id="startGameSection" style="display:none;">
+        <label for="questionCount">Numero di domande:</label>
+        <select id="questionCount">
+          <option value="10">10</option>
+          <option value="20">20</option>
+        </select>
+        <button id="startGameButton"><i class="fa-solid fa-play"></i> Inizia Gioco</button>
+      </div>
+      <div id="playersList" style="display:none;">
+        <h3><i class="fa-solid fa-users"></i> Giocatori nella Lobby:</h3>
+        <ul id="playersUl"></ul>
+      </div>
+      <div id="gameSection" style="display:none;position:relative;">
+        <p id="questionNumber"></p>
+        <div id="questionSection">
+          <p class="question" id="questionText"></p>
+          <!-- Immagine domanda -->
+          <img id="questionImage" style="display:none;max-width:320px;margin:10px auto 0;"/>
+          <div class="answers" id="answersList"></div>
+        </div>
+        <p id="scoreText"></p>
+        <p class="timer" id="timerText">Tempo rimanente: 10s</p>
+        <!-- Barra timer dinamica -->
+        <div id="timerBar" style="height:6px;background:#4caf50;width:100%;transition:width 0.3s;margin-bottom:10px;"></div>
+        <div id="powerUps" style="margin:10px 0; display:none;">
+          <button id="power5050" title="50:50" style="margin-right:5px;">🌓 50:50</button>
+          <button id="powerSkip" title="Salta domanda" style="margin-right:5px;">⏭️ Salta</button>
+          <button id="powerTime" title="Tempo extra">⏰ +10s</button>
+        </div>
+        <button id="nextQuestionBtn" style="display:none; margin-top:10px;"><i class="fa-solid fa-forward"></i> Prosegui</button>
+        <div id="singlePlayerTrophiesBox" style="display:none; margin-top:10px;">
+          🏆 Trofei rimanenti: <span id="singlePlayerTrophies">10</span>
+        </div>
+        <!-- Chat compatta durante la partita -->
+        <div id="gameChatContainer">
+          <div id="gameChatBox"></div>
+          <div style="display:flex;gap:4px;margin-top:2px;">
+            <input id="gameChatInput" type="text" placeholder="Chat...">
+            <button id="gameChatSend">Invia</button>
+          </div>
+        </div>
+      </div>
+      <div id="gameOverScreen" style="display:none;">
+        <h2>🎉 Gioco Terminato!</h2>
+        <ul id="finalScores"></ul>
+        <button id="readyButton"><i class="fa-solid fa-check"></i> Pronto per una nuova partita</button>
+        <button id="returnToMainMenuButton"><i class="fa-solid fa-home"></i> Torna al Main Menu</button>
+        <p id="readyStatusText"></p>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+
+
+
+
+    <div id="challengeModal" class="profile-modal" style="display:none; min-width:300px;">
+      <h2>Sfida un amico</h2>
+      <input type="text" id="challengeUsernameInput" placeholder="Nome utente dell'amico">
+      <button id="sendChallengeBtn">Invia sfida</button>
+      <button id="closeChallengeModal" style="background:#888; margin-left:10px;">Chiudi</button>
+      <div id="challengeError" class="error-message"></div>
+    </div>
+    <div id="challengeInvitesModal" class="profile-modal" style="display:none;">
+      <h2>Inviti Sfida Ricevuti</h2>
+      <ul id="challengeInvitesList"></ul>
+      <button id="closeInvitesModal">Chiudi</button>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="shop.js"></script>
+  <script src="main.js"></script>
+  <script>
+    // filepath: c:\Users\lucab\OneDrive\Desktop\quiz-game-backend\public\index.html
+    // Assicura che il bottone missioni apra la modale missioni
+    document.getElementById('missionsButton').onclick = function(e) {
+      if (typeof showMissionsModal === 'function') showMissionsModal();
+    };
+  </script>
+
+</body>
+</html>

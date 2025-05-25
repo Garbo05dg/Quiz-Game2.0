@@ -1,0 +1,25 @@
+<!-- filepath: c:\Users\lucab\OneDrive\Desktop\quiz-game-backend\public\shop-success.html -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Pagamento completato</title>
+</head>
+<body>
+  <h1>Pagamento completato!</h1>
+  <p>Grazie per il tuo acquisto. Le monete/gemme saranno accreditate a breve.</p>
+  <a href="/">Torna al gioco</a>
+  <script>
+  // Se usi socket.io, aggiorna il profilo dopo il pagamento
+  if (window.opener && window.opener.socket) {
+    window.opener.socket.emit('getProfile');
+  }
+  // Oppure, se sei nella stessa finestra:
+  if (window.socket) {
+    window.socket.emit('getProfile');
+  }
+  // Oppure ricarica la pagina principale
+  // window.location.href = '/';
+  </script>
+</body>
+</html>
